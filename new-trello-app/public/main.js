@@ -81,6 +81,15 @@ function saveName() {
         inputBox.style.backgroundColor = "red";
     }
 
+    postData('/api/addSwimlane', {
+        swimTitle:this.parentElement.childNodes[0].value
+        
+    })
+    .then(data => console.log(JSON.stringify(data))) // JSON-string from `response.json()` call
+    .catch(error => console.error(error))
+
+
+
 }
 
 
@@ -122,7 +131,7 @@ function addCard() {
     saveCardButton.addEventListener("click", saveCard);
     card.appendChild(saveCardButton);
 
-    
+
 
     let moveCardUpButton = document.createElement("button");
     //moveCardUpButton.innerText = "Move card up";
@@ -138,7 +147,7 @@ function addCard() {
 
     let moveCardLeftButton = document.createElement("button");
     //moveCardLeftButton.innerText = "Move card left";
-    moveCardLeftButton.innerHTML ='<i class="fas fa-arrow-left"></i>'
+    moveCardLeftButton.innerHTML = '<i class="fas fa-arrow-left"></i>'
     moveCardLeftButton.addEventListener("click", moveCardLeft);
     card.appendChild(moveCardLeftButton);
 
@@ -150,7 +159,7 @@ function addCard() {
 
     let deleteCardButton = document.createElement("button");
     //deleteCardButton.innerText = "Delete Card";
-    deleteCardButton.innerHTML ='<i class="fas fa-trash"></i>';
+    deleteCardButton.innerHTML = '<i class="fas fa-trash"></i>';
     delete
     deleteCardButton.addEventListener("click", deleteCard);
     card.appendChild(deleteCardButton)
@@ -171,7 +180,7 @@ function saveCard() {
     let inputTitle = inputTitleBox.value //get user input
     let inputDescriptionBox = this.parentElement.childNodes[2]; //input textbox
     let inputDescription = inputDescriptionBox.value //get user input
-    
+
 
     if (inputTitle && inputDescription) { //textboxe are not empty
         let title = this.parentElement.childNodes[1] // title text 
@@ -181,6 +190,7 @@ function saveCard() {
         let description = this.parentElement.childNodes[3]; // description text
         description.innerText = inputDescription; //change description
         description.style.display = "block"; // show description text
+
 
         // let edit = this.parentElement.childNodes[5]; //edit button
         let save = this.parentElement.childNodes[4]; //save button
@@ -206,7 +216,17 @@ function saveCard() {
         inputTitleBox.style.backgroundColor = "red";
         inputDescriptionBox.style.backgroundColor = "red";
     }
-    
+
+    postData('/api/save', {
+        title:this.parentElement.childNodes[1].innerText,
+        description:this.parentElement.childNodes[3].innerText
+    })
+    .then(data => console.log(JSON.stringify(data))) // JSON-string from `response.json()` call
+    .catch(error => console.error(error))
+
+
+
+
 
 }
 
@@ -224,7 +244,7 @@ function editCard() {
     title.style.display = "none" //hide input title textbox
     description.style.display = "none" //hide input description textbox
     // edit.style.display = "none";
-    
+
 }
 
 function moveCardUp() {
