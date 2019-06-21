@@ -81,12 +81,12 @@ function saveName() {
         inputBox.style.backgroundColor = "red";
     }
 
-    postData('/api/addSwimlane', {
-        swimTitle:this.parentElement.childNodes[0].value
-        
-    })
-    .then(data => console.log(JSON.stringify(data))) // JSON-string from `response.json()` call
-    .catch(error => console.error(error))
+    postData('/api/swimlanes', {
+            title: this.parentElement.childNodes[0].value
+
+        })
+        .then(data => console.log(JSON.stringify(data))) // JSON-string from `response.json()` call
+        .catch(error => console.error(error))
 
 
 
@@ -217,12 +217,17 @@ function saveCard() {
         inputDescriptionBox.style.backgroundColor = "red";
     }
 
-    postData('/api/save', {
-        title:this.parentElement.childNodes[1].innerText,
-        description:this.parentElement.childNodes[3].innerText
-    })
-    .then(data => console.log(JSON.stringify(data))) // JSON-string from `response.json()` call
-    .catch(error => console.error(error))
+    // needs to post to /api/swimlanes/:id/cards
+
+    //
+    let swimlaneId = 2;
+
+    postData(`/api/swimlanes/${swimlaneId}/cards`, {
+            title: this.parentElement.childNodes[1].innerText,
+            description: this.parentElement.childNodes[3].innerText
+        })
+        .then(data => console.log(JSON.stringify(data))) // JSON-string from `response.json()` call
+        .catch(error => console.error(error))
 
 
 
