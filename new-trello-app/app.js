@@ -10,29 +10,35 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 var path = require("path")
 var public = path.join(__dirname, 'public');
 
+
+let swimlaneCounter = 2;
+let cardCounter = 3;
 const swimlanes = [{
         id: 1,
         title: "first swimlane",
-        cards: [
+        isDeleted: false,
+
+        cards: [{
+                id: 1,
+                title: 'first card',
+                // other data below
+
+            },
             {
-            id: 1,
-            title: 'first card',
-            // other data below
+                id: 2,
+                title: 'second card',
+                // other data below
 
-        },
-        {
-            id: 2,
-            title: 'second card',
-            // other data below
-
-        }
-    ]
+            }
+        ]
     },
     {
         id: 2,
         title: "second swimlane",
+        isDeleted: false,
+
         cards: [{
-            id: 1,
+            id: 3,
             title: 'first card',
             // other data below
         }]
@@ -48,9 +54,25 @@ app.get('/', function (req, res) {
 });
 
 
+
 app.get("/api/swimlanes", (req, res) => {
-    res.send(swimlanes)
+    // TODO: Only show the swimlanes with isDeleted equal to false
+
+    // swimlanes.map() loops through each swimlane automatically,
+    // and calls your function for each one. When the function returns true,
+    // that swimlane is included in the new array.
+    let newArray = swimlanes.filter((swimlane) => {
+        if (swimlane.isDeleted == false) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+
+    res.send(newArray);
 })
+
+
 
 // NOTE: The curly brackets create a "variable" whose value comes from the URL
 // 		 The variable can be accessed as a member of req.params using the same name
@@ -84,10 +106,13 @@ app.get("/api/cards/:id", (req, res) => {
     // TODO: Send the card whose id is req.params.id
     let card;
 
-    // FOR EACH CARD (in the first swimlane)
-    for (let i = 0; i < swimlanes[0].cards.length; i++) {
-        if (swimlanes[0].cards[i].id == req.params.id) {
-            card = swimlanes[0].cards[i];
+    // FOR EACH SWIM LANE...
+    for (let s = 0; s < swimlanes.length; s++) {
+        // FOR EACH CARD...
+        for (let c = 0; c < swimlanes[s].cards.length; c++) {
+            if (swimlanes[s].cards[c].id == req.params.id) {
+                card = swimlanes[s].cards[c];
+            }
         }
     }
 
@@ -96,27 +121,84 @@ app.get("/api/cards/:id", (req, res) => {
 
 
 app.post('/api/swimlanes', (req, res) => {
-    let data = req.body;
-    console.log('adding swimlane')
-    console.log(data)
+    //let data = req.body;
+
+    swimlaneCounter++;
+
     swimlanes.push({
-        ...data,
-        id: swimlanes.length + 1,
-        cards: []
+        id: swimlaneCounter,
+        cards: [],
+        title: "",
+        isDeleted: false
     });
+
+
     res.send(200)
 })
 
 app.post('/api/swimlanes/:id/cards', (req, res) => {
-    console.log(req.params.id)
-    console.log(req.body)
-    console.log(swimlanes)
-    // find the swimlane by id in the swimlanes array
-    // useing the req.params.id
+    cardCounter++;
+    let swimlane;
 
-    // push the new card data 
-    // swimlane.cards.push(data)
+    for (let i = 0; i < swimlanes.length; i++) {
+        if (swimlanes[i].id == req.params.id) {
+            swimlane = swimlanes[i];
+        }
+    }
+
+    swimlane.cards.push({
+        id: cardCounter,
+        title: ""
+    });
+
+
+    res.send(200)
+
 })
+
+
+app.delete("/api/swimlanes/:id", (req, res) => {
+
+    for (let i = 0; i < swimlanes.length; i++) {
+        if (swimlanes[i].id == req.params.id) {
+            // 2. Delete the swimlane at i
+            swimlanes.splice(i, 1);
+        }
+    }
+
+    res.send(200)
+
+})
+
+
+app.delete('/api/cards/:id', (req, res) => {
+
+    let card;
+    // FOR EACH SWIM LANE...
+    for (let s = 0; s < swimlanes.length; s++) {
+        // FOR EACH CARD...
+        for (let c = 0; c < swimlanes[s].cards.length; c++) {
+            if (swimlanes[s].cards[c].id == req.params.id) {
+                card = swimlanes[s].cards[c];
+                swimlanes[s].cards.splice(c, 1)
+            }
+        }
+    }
+
+    res.send(card);
+})
+
+// --------------------------------------------------------------
+// TODO: Update (put) route for updating/changing a swimlane
+// 1. Find the swimlane
+// 2. Set its properties equal to the properties of req.body
+// Example:
+// req.body.title should be a property. It depends on the "name" attributes
+// of the input elements in the HTML form.
+
+// TODO: Update (put) route for updating/changing a card
+
+// --------------------------------------------------------------
 
 
 
