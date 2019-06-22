@@ -58,9 +58,6 @@ app.get('/', function (req, res) {
 app.get("/api/swimlanes", (req, res) => {
     // TODO: Only show the swimlanes with isDeleted equal to false
 
-    // swimlanes.map() loops through each swimlane automatically,
-    // and calls your function for each one. When the function returns true,
-    // that swimlane is included in the new array.
     let newArray = swimlanes.filter((swimlane) => {
         if (swimlane.isDeleted == false) {
             return true;
@@ -199,6 +196,30 @@ app.delete('/api/cards/:id', (req, res) => {
 // TODO: Update (put) route for updating/changing a card
 
 // --------------------------------------------------------------
+
+
+app.put('/api/swimlanes/:id', (req, res) => {
+
+    for (let i = 0; i < swimlanes.length; i++) {
+        if (swimlanes[i].id == req.params.id) {
+            swimlanes[i].title = req.body.title;
+        }
+    }
+    res.send(200);
+
+})
+
+app.put('/api/cards/:id', (req, res) => {
+    for (let s = 0; s < swimlanes.length; s++) {
+        for (let c = 0; c < swimlanes[s].cards.length; c++) {
+            if (swimlanes[s].cards[c].id == req.params.id) {
+                swimlanes[s].cards[c].title = req.body.title;
+            }
+        }
+    }
+    res.send(200);
+})
+
 
 
 

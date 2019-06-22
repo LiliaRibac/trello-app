@@ -1,4 +1,7 @@
 function addSwimlane() {
+
+    request('POST', '/api/swimlanes', {});
+
     let swimlane = document.createElement("div");
     swimlane.setAttribute("class", "swimlane");
 
@@ -373,3 +376,27 @@ function deleteAllSwimlanes() {
         }
     }
 }
+
+
+
+
+function request(methodParam, url = '', data = {}) {
+
+    // NOTE: fetch() sends an request to our app to either C, R, U, or D
+    return fetch(url, {
+        //	 C    R    U     D
+        method: methodParam, // POST, GET, PUT, DELETE
+        //mode: 'cors',
+        cache: 'no-cache', // Ensures that the browser doesn't save old responses (always load the new response)
+        headers: {
+          'Content-Type': 'application/json',
+          //'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(data), // body data type must match "Content-Type" header
+      })
+      .then((response) => {
+  
+        console.log(response.json());
+  
+      });
+  }
