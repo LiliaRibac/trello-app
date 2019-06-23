@@ -1,16 +1,18 @@
 
 
-//   C    R    U     D
-// POST, GET, PUT, DELETE
 
 request('GET', '/api/swimlanes', {}).then( (response) => {
-    // TODO:
-    // 1. Show an HTML element FOR EACH swimlane
-    // 2. Show the data (title) of each swimlane in its element
     
     response.json( ).then( ( swimlanes ) => {
       for(let i =0; i <swimlanes.length; i++){
-          addSwimlaneElement( swimlanes[i].title );
+          let swimlaneElement = addSwimlaneElement(swimlanes[i].id, swimlanes[i].title );
+        
+          let addCardButtons = swimlaneElement.getElementsByClassName( "addCardButton" );
+        
+          for (let c = 0; c < swimlanes[i].cards.length; c++) {
+            
+            addCardElement.bind( addCardButtons[0] )( swimlanes[i].cards[c].title, swimlanes[i].cards[c].description );
+          }
       }
     
       
@@ -20,20 +22,22 @@ request('GET', '/api/swimlanes', {}).then( (response) => {
   
   function createSwimlane() {
       
-        // NOTE: You can optionally accept a parameter in your callback.
+      // NOTE: You can optionally accept a parameter in your callback.
       // 		 That parameter is the response.
       request('POST', '/api/swimlanes', {}).then( (response) => {
           
-          addSwimlaneElement( );
-        
+        response.text( ).then( (id) => {
+          addSwimlaneElement( id );
+        } );
       } );
   
   }
   
-  //                             default value
-  //                                   v
-  function addSwimlaneElement( title = "" ){
+  //                          default value
+  //                                v
+  function addSwimlaneElement( id = 0, title = "" ){
     let swimlane = document.createElement("div");
+    swimlane.setAttribute("data-id", id);
     swimlane.setAttribute("class", "swimlane");
   
     let container = document.getElementById("container");
@@ -69,8 +73,9 @@ request('GET', '/api/swimlanes', {}).then( (response) => {
     swimlane.appendChild(nameContainer);
   
     let addCardButton = document.createElement("button");
+    addCardButton.className = "addCardButton";
     addCardButton.innerText = "Add card";
-    addCardButton.addEventListener("click", addCard);
+    addCardButton.addEventListener("click", createCard);
     swimlane.appendChild(addCardButton);
   
     let deleteAllCardsButton = document.createElement("button");
@@ -94,13 +99,12 @@ request('GET', '/api/swimlanes', {}).then( (response) => {
     deleteButton.addEventListener("click", deleteSwimlane);
     swimlane.appendChild(deleteButton);
     
-    // if( title != "" ){
-    //     showTitle.bind( saveButton )();
-    // }
+   
     if( title != "" ){
-        let boundFunction = showTitle.bind( saveButton );
-          boundFunction( );
-      }
+        showTitle.bind( saveButton )( );
+    }
+    
+    return swimlane;
   }
   
   function showTitle( ){
@@ -128,7 +132,7 @@ request('GET', '/api/swimlanes', {}).then( (response) => {
     
   function saveName() {
       
-        showTitle( );
+      showTitle.bind(this)( );
   
       postData('/api/swimlanes', {
               title: this.parentElement.childNodes[0].value
@@ -152,12 +156,26 @@ request('GET', '/api/swimlanes', {}).then( (response) => {
       edit.style.display = "none" //hide name text
   }
   
-  function addCard() {
+
+  function createCard() {
+      let id = this.parentElement.getAttribute( "data-id" );
+    
+      request('POST', '/api/swimlanes/' + id + '/cards', {}).then( (response) => {
+          
+          addCardElement.bind(this)( );
+        
+      } );
+  
+  }
+  
+
+  function addCardElement(title = "", description = "") {
   
       let card = document.createElement("div");
       card.setAttribute("class", "card");
   
       let cardTitleInput = document.createElement("input");
+      cardTitleInput.value =title;
       cardTitleInput.setAttribute("placeholder", "Enter card title");
       card.appendChild(cardTitleInput);
   
@@ -166,6 +184,7 @@ request('GET', '/api/swimlanes', {}).then( (response) => {
       card.appendChild(cardTitle);
   
       let cardDescriptionInput = document.createElement("input");
+      cardDescriptionInput.value = description;
       cardDescriptionInput.setAttribute("placeholder", "Enter card description");
       card.appendChild(cardDescriptionInput);
   
@@ -220,10 +239,16 @@ request('GET', '/api/swimlanes', {}).then( (response) => {
   
       this.parentElement.appendChild(card) //add card to swimlane
   
+    
+      if( title != "" || description != "" ){
+        showCardDetails.bind( saveCardButton )( );
+      }
+
+      return card;
   }
   
-  function saveCard() {
-      let inputTitleBox = this.parentElement.childNodes[0]; //input textbox
+  function showCardDetails( ){
+   	  let inputTitleBox = this.parentElement.childNodes[0]; //input textbox
       let inputTitle = inputTitleBox.value //get user input
       let inputDescriptionBox = this.parentElement.childNodes[2]; //input textbox
       let inputDescription = inputDescriptionBox.value //get user input
@@ -262,11 +287,14 @@ request('GET', '/api/swimlanes', {}).then( (response) => {
       if (!inputTitle && !inputDescription) {
           inputTitleBox.style.backgroundColor = "red";
           inputDescriptionBox.style.backgroundColor = "red";
-      }
+      } 
+  }
+
+  function saveCard() {
+		
+      showCardDetails.bind(this)( );
   
-      // needs to post to /api/swimlanes/:id/cards
-  
-      //
+      
       let swimlaneId = 2;
   
       postData(`/api/swimlanes/${swimlaneId}/cards`, {
@@ -275,10 +303,6 @@ request('GET', '/api/swimlanes', {}).then( (response) => {
           })
           .then(data => console.log(JSON.stringify(data))) // JSON-string from `response.json()` call
           .catch(error => console.error(error))
-  
-  
-  
-  
   
   }
   
@@ -445,9 +469,7 @@ request('GET', '/api/swimlanes', {}).then( (response) => {
           
       // NOTE: fetch() sends an request to our app to either C, R, U, or D
       return fetch(url, settings);
-    
-    // .then() accepts a "callback function" which it will call automatically when the server responds to the request
-    // request( "GET", "/api/cards" ).then( (response) => { return response; } );
+   
   }
     
     

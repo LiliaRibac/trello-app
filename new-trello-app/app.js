@@ -21,12 +21,14 @@ const swimlanes = [{
         cards: [{
                 id: 1,
                 title: 'first card',
+                description: "first description"
                 // other data below
 
             },
             {
                 id: 2,
                 title: 'second card',
+                description: "second description"
                 // other data below
 
             }
@@ -40,6 +42,7 @@ const swimlanes = [{
         cards: [{
             id: 3,
             title: 'first card',
+            description: "first description"
             // other data below
         }]
     }
@@ -130,7 +133,7 @@ app.post('/api/swimlanes', (req, res) => {
     });
 
 
-    res.send(200)
+    res.send(swimlaneCounter  + "")
 })
 
 app.post('/api/swimlanes/:id/cards', (req, res) => {
@@ -145,7 +148,8 @@ app.post('/api/swimlanes/:id/cards', (req, res) => {
 
     swimlane.cards.push({
         id: cardCounter,
-        title: ""
+        title: "",
+        description: ""
     });
 
 
@@ -214,6 +218,7 @@ app.put('/api/cards/:id', (req, res) => {
         for (let c = 0; c < swimlanes[s].cards.length; c++) {
             if (swimlanes[s].cards[c].id == req.params.id) {
                 swimlanes[s].cards[c].title = req.body.title;
+                swimlanes[s].cards[c].description = req.body.title.description;
             }
         }
     }

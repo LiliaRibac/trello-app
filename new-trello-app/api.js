@@ -7,9 +7,6 @@ DELETE - Remove
  */
 
 
-//when project loads call API async wait* 
-// Get to Get Card 
-//swimlanes
 window.onload = async function () {
   fetch('/api/swimlanes')
     .then(function (response) {
